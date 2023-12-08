@@ -96,7 +96,7 @@ async function callChatGPTService(content, token, arkoseToken) {
         action: "next",
         messages: [{ id: generateUUID(), role: "user", content: { content_type: "text", parts: [content] } }],
         arkose_token: arkoseToken,
-        model: "gpt-3.5-turbo",
+        model: "text-davinci-002-render", //"gpt-3.5-turbo",
         parent_message_id: generateUUID()
     };
 
@@ -120,9 +120,9 @@ async function callChatGPTService(content, token, arkoseToken) {
 }
 
 async function processContentWithChatGPT(content) {
+    const token = await getChatGPTToken();
+    const arkoseToken = await getArkoseToken();
     try {
-        const token = await getChatGPTToken();
-        const arkoseToken = await getArkoseToken();
         const response = await callChatGPTService(content, token, arkoseToken);
         console.log("ChatGPT Response:", response);
     } catch (error) {
@@ -153,4 +153,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-setInterval(checkForUrl, 60000);
+setInterval(checkForUrl, 200000);
