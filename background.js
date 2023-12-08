@@ -13,15 +13,15 @@ function checkForUrl() {
         .then(data => {
             if (data.length > 0) {
                 let url = `https://here.news/story/${data[0].uuid}`;
-                // For testing: url = `https://www.chronicle.com/article/why-faculty-members-are-fleeing-florida`;
-
+                // For testing: let url = `https://www.axios.com/chinese-service-center-africa`;
+                // for testing: let url = `https://www.science.org/content/article/spain-wants-change-how-it-evaluates-scientists-and-end-dictatorship-papers`;
                 chrome.tabs.create({ url: url }, (tab) => {
                     setTimeout(() => {
                         chrome.scripting.executeScript({
                             target: { tabId: tab.id },
                             files: ['content.js']
                         });
-                    }, 2000); // Delay to ensure the page loads
+                    }, 5000); // Delay to ensure the page loads
                 });
             } else {
                 working = false;
@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         setTimeout(() => {
             chrome.tabs.remove(sender.tab.id);
             working = false;
-        }, 5000);
+        }, 2000);
     }
 });
 
