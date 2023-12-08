@@ -1,6 +1,7 @@
 window.__SAMPLE_EXTENSION_NAMESPACE__ = {
     getElementTree() {
-        return {
+        return document.body.textContent;
+	return {
             tagName: "body",
             children: this.getElementTreeForNode({ el: document.body })
         };

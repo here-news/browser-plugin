@@ -4,12 +4,12 @@ const treeContainer = document.querySelector("div");
 const createTreeDOM = (node, spacer = "") => {
     const container = document.createElement("div");
 
-    if (node.children.length === 0) {
+    //if (node.children.length === 0) {
         const tag = document.createElement("p");
-        tag.innerHTML = `${spacer}&lt;${node.tagName}&gt;&lt;/${node.tagName}&gt;`;
+        tag.innerHTML = `${node}`;
 
         container.appendChild(tag);
-    } else {
+    /*} else {
         const openingTag = document.createElement("p");
         openingTag.innerHTML = `${spacer}&lt;${node.tagName}&gt;`;
 
@@ -25,7 +25,7 @@ const createTreeDOM = (node, spacer = "") => {
         closingTag.innerHTML = `${spacer}&lt;/${node.tagName}&gt;`;
 
         container.appendChild(closingTag);
-    }
+    }*/
 
     return container;
 };
