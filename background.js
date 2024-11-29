@@ -80,7 +80,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         callOpenAIAPI(prompt).then(summary => {
             // Send the summary back to the content script or popup
             console.log(summary);
-            chrome.runtime.sendMessage({ action: "displaySummary", summary: summary });
+            //chrome.runtime.sendMessage({ action: "displaySummary", summary: summary });
+            // will deal with the summary here
         });
 
         setTimeout(() => {

@@ -1,12 +1,11 @@
-## sample-extension
+## Browser-based scraping with Chrome extensions
 
-This sample Chrome Extension shows how to use the different scripts available to Chrome extensions to access the JavaScript environment and DOM of a user's page.
+For those strictly prohibited web pages, we tend to move to client side and make them into news.
 
 ### What it can do?
-- [x] know when it is being used and set the icon in the Chrome toolbar
-- [x] add a global variable to the JavaScript environment of the user's page
-- [x] read the DOM of the user's page
-- [x] display the Element tree in a Panel in devtools
+- [] 
+- [] 
+
 
 ## What scripts are used?
 
