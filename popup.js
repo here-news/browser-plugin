@@ -39,12 +39,29 @@ document.addEventListener("DOMContentLoaded", () => {
             container.innerHTML = newsList
                 .map(
                     (item) => `
-                    <div class="news-item">
+                    <div class="news-item" data-preview="${item.preview}">
                         <p><b><a href="${item.canonical}" target="_blank">${item.title}</a></b> (${item.source}, ${new Date(item.pub_time).toLocaleString()})</p>
+                        <img src="${item.preview}" alt="Thumbnail" />
                     </div>
                 `
                 )
                 .join("");
+
+            // Add event listener to each news item for preview
+            // Add hover event listeners to show/hide thumbnails
+            const newsItems = container.querySelectorAll(".news-item");
+            newsItems.forEach((newsItem) => {
+                const thumbnail = newsItem.querySelector("img");
+
+                newsItem.addEventListener("mouseenter", () => {
+                    if (thumbnail) thumbnail.style.display = "block";
+                });
+
+                newsItem.addEventListener("mouseleave", () => {
+                    if (thumbnail) thumbnail.style.display = "none";
+                });
+            });
+
         }
     }
 });

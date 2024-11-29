@@ -9,6 +9,12 @@
         }
         .news-item {
             margin-bottom: 10px;
+            position: relative; /* Required for positioning thumbnail */
+        }
+        .news-item img {
+            display: none; /* Initially hidden */
+            max-width: 100%; /* Ensure it fits within the container */
+            margin-top: 5px;
         }
         a {
             text-decoration: none;
