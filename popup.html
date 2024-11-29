@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            width: 300px;
+        }
+        .news-item {
+            margin-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: gray;
+            margin-top: 10px;
+        }
+        #refresh-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #refresh-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="news-list">
+        <p>Loading related news...</p>
+    </div>
+    <button id="refresh-button">Refresh</button>
+    <p id="last-updated" class="timestamp"></p>
+    <script src="popup.js"></script>
+</body>
+</html>

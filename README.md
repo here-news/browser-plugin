@@ -1,64 +1,73 @@
-## Browser-based scraping with Chrome extensions
+## Find Related News While You Browse the Web
 
-For those strictly prohibited web pages, we tend to move to client side and make them into news.
+Ever wanted to dive deeper into a topic you’re browsing online? This browser extension connects you to related news articles in real time, bringing you fresh, relevant, and popular insights. Powered by the HERE.news API, it not only keeps you informed but also invites you to join the conversation—share your thoughts, engage with the news, and even earn rewards for your participation.
 
-### What it can do?
-- [] 
-- [] 
+### Key Features:
+- **Instant News Discovery**: See related news articles for the topics you’re browsing without leaving the page.
+- **Relevance & Popularity**: The extension curates articles based on their topical relevance and popularity.
+- **Interactive Engagement**: Participate in the news ecosystem—add your opinions, share stories, and earn money.
+- **Free & Easy**: Completely free to use, with seamless integration into your browsing experience.
 
+---
 
-## What scripts are used?
+## How It Works
 
-### background script
+1. **Browsing Context**: As you browse the web, the extension detects the topic on the page.
+2. **HERE.news API Integration**: The detected topic is sent to the HERE.news API—a RESTful service that aggregates news articles from a variety of sources.
+3. **Popup Display**: The API returns a curated list of articles, displayed in a sleek popup panel right in your browser.
+4. **Engagement Options**: Users can view articles, interact with news stories, and join the HERE.news ecosystem.
 
-A [background script](https://developer.chrome.com/extensions/background_pages) is used to listen for messages from other scripts. As the name indicates, this runs in the background and is always available &mdash; even if no devtools windows are open.
+---
 
-This is executed by setting the following properties in the extension's [manifest](https://developer.chrome.com/extensions/manifest):
+## Technical Overview
 
-```json
-"background": {
-    "scripts": [ "background.js" ]
-}
-```
+### **Background Script**
+The background script manages the extension's persistent functionality:
+- Monitors messages from other scripts.
+- Updates the browser toolbar icon with a notification badge indicating the number of related articles found.
+- Configured in the extension manifest:
+  ```json
+  "background": {
+      "scripts": ["background.js"]
+  }
+  ```
 
-All this simple background script does is change the icon displayed in the Chrome toolbar when the extension is in use.
+### **Content Script**
+The content script handles interaction with the current web page:
+- Injects code to read the DOM for topic extraction.
+- Sends the extracted content to the background script for processing.
+- Configured via the manifest:
+  ```json
+  "content_scripts": [{
+      "all_frames": true,
+      "js": ["content.js"],
+      "matches": ["*://*/*"]
+  }]
+  ```
+  
+### **Injected Script**
+This script integrates directly into the web page:
+- Gains access to the full DOM and JavaScript environment.
+- Sets up a global namespace (`window.__HERE_NEWS_EXTENSION__`) for cross-context communication.
 
-### content script
+### **DevTools Integration**
+A custom panel in Chrome DevTools allows advanced users to:
+- View API requests and responses.
+- Interact with a live feed of related articles.
+- Uses `chrome.devtools.inspectedWindow.eval` for seamless data retrieval and display.
 
-A [content script](https://developer.chrome.com/extensions/content_scripts) is also set up through the manifest using this configuration:
+---
 
-```json
-"content_scripts": [{
-    "all_frames": true,
-    "js": [ "content.js" ],
-    "matches": [ "*://*/*" ]
-}]
-```
+## How to Get Started
 
-This script is injected by the extension into each frame of the page. It can access the DOM of the user's page, but runs in an isolated JavaScript environment.
-
-The content script can also use `chrome.*` APIs as explained in the [extensions docs](https://developer.chrome.com/extensions/content_scripts#capabilities).
-
-> Note: although not shown in this example, the content script could pass messages to the background script or other parts of the extension through the [`chrome.runtime.connect` API](https://developer.chrome.com/extensions/content_scripts#host-page-communication).
-
-### injected script
-
-The content script also injects a `<script>` tag into the users page. This injected script has access to the DOM and also the JavaScript environment of the user's page.
-
-This script sets up a global variable (`window.__SAMPLE_EXTENSION_NAMESPACE__`) that contains functions that can be used by devtools page (explained below).
-
-> Note: although not shown in this example, the injected script could pass messages to the content script through [`window.postMessage`](https://developer.chrome.com/extensions/content_scripts#host-page-communication).
-
-### devtools_page
-
-Not _technically_ a script, but this html page loads a JavaScript file that extends Chrome's devtools with a new panel.
-
-This panel uses the [chrome.devtools.inspectedWindow.eval](https://developer.chrome.com/extensions/devtools_inspectedWindow) to call functions on the `__SAMPLE_EXTENSION_NAMESPACE__` object to retrieve data from the user's page and display it in the devtools panel.
-
-## How do I run it?
-
-1. clone the repo
-2. navigate Chrome to chrome://extensions/
-3. click "Load Unpacked"
-4. select the directory where the repo is cloned
-5. open Chrome devtools and click on the "Sample Extension" panel
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   ```
+2. Navigate to Chrome’s Extensions page:
+   ```
+   chrome://extensions/
+   ```
+3. Enable **Developer Mode**.
+4. Click **Load Unpacked** and select the cloned repository directory.
+5. Start browsing and open DevTools to explore the "HERE.news Extension" panel.

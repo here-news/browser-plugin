@@ -1,19 +1,9 @@
-function processContent() {
-    console.log("Processing page content...");
-    let content = document.body.innerText; // Adjust selector as needed
-    chrome.runtime.sendMessage({action: "jobDone", content: content});
-}
-
-if (document.readyState === "loading") {
-    document.addEventListener('DOMContentLoaded', processContent);
-} else {
-    processContent(); // DOMContentLoaded has already fired
-}
-
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "processContent") {
-        processContent();
+// content.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "fetchPageContext") {
+        const title = document.title;
+        const content = document.body.innerText.slice(0, 200); // First 200 characters as a brief snippet
+        sendResponse({ title, content });
+        console.log("Sending page context to background.js", { title, content });
     }
 });
-
