@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (newsList.length === 0) {
             container.innerHTML = "<p>No related news found.</p>";
         } else {
+            // choose those with high scores(>0.92)
+            newsList = newsList.filter((item) => item.score > 0.92);
             container.innerHTML = newsList
                 .map(
                     (item) => `
