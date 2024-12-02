@@ -10,7 +10,7 @@ function fetchAndCacheNews(url, title, content) {
         const query = encodeURIComponent(`${title}`.substring(0, 120));
         const apiUrl = `https://api.here.news/searchnews?q=${query}`;
 
-        //chrome.action.setBadgeText({ text: count > 0 ? "⚡" : "" }); // Indicate loading  => deprecated
+        chrome.action.setBadgeText({ text: "⚡" }); // Indicate loading 
 
         fetch(apiUrl)
             .then((res) => res.json())
@@ -19,8 +19,9 @@ function fetchAndCacheNews(url, title, content) {
                 const relevantNews = newsList.filter((item) => item.score > 0.92);
                 const count = relevantNews.length;
 
-                // Update badge
-                chrome.action.setBadgeText({ text: count > 0 ? "⚡" : "" });  // chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
+                // Update badge & title
+                chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });  
+                chrome.action.setTitle({ title: `${count} related news articles` });
 
                 // Cache the results
                 chrome.storage.local.get("newsCache", (data) => {
@@ -76,7 +77,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
             if (cachedNews) {
                 const count = cachedNews.filter((item) => item.score > 0.92).length;
-                chrome.action.setBadgeText({ text: count > 0 ? "⚡" : "" });
+                chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });  
+                chrome.action.setTitle({ title: `${count} related news articles` });
                 chrome.storage.local.set({ newsData: cachedNews });
             } else {
                 // Fetch fresh news
@@ -102,7 +104,8 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 
                 if (cachedNews) {
                     const count = cachedNews.filter((item) => item.score > 0.92).length;
-                    chrome.action.setBadgeText({ text: count > 0 ? "⚡" : "" });
+                    chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });
+                    chrome.action.setTitle({ title: `${count} related news articles` });
                     chrome.storage.local.set({ newsData: cachedNews });
                 } else {
                     chrome.action.setBadgeText({ text: "" }); // Clear badge if no cached data
