@@ -20,7 +20,7 @@ function fetchAndCacheNews(url, title, content) {
                 const count = relevantNews.length;
 
                 // Update badge & title
-                chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });  
+                chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
                 chrome.action.setTitle({ title: `${count} related news articles` });
 
                 // Cache the results
@@ -33,6 +33,17 @@ function fetchAndCacheNews(url, title, content) {
                         newsData: relevantNews,
                         lastUpdated: new Date().toISOString(),
                     });
+
+                // Send the count to the content script
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs[0]) {
+                        chrome.tabs.sendMessage(tabs[0].id, {
+                            action: "updateBadge",
+                            value: count*10,
+                        });
+                    }
+                });
+
 
                     resolve(relevantNews); // Resolve with the filtered news
                 });
@@ -77,7 +88,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
             if (cachedNews) {
                 const count = cachedNews.filter((item) => item.score > 0.92).length;
-                chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });  
+                chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
                 chrome.action.setTitle({ title: `${count} related news articles` });
                 chrome.storage.local.set({ newsData: cachedNews });
             } else {
@@ -104,7 +115,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 
                 if (cachedNews) {
                     const count = cachedNews.filter((item) => item.score > 0.92).length;
-                    chrome.action.setBadgeText({ text: count > 0 ? "★" : "" });
+                    chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
                     chrome.action.setTitle({ title: `${count} related news articles` });
                     chrome.storage.local.set({ newsData: cachedNews });
                 } else {
