@@ -1,3 +1,11 @@
+function getFromCache(url, callback) {
+    chrome.storage.local.get("newsCache", (data) => {
+        const newsCache = data.newsCache || [];
+        const cachedEntry = newsCache.find((entry) => entry.url === url);
+        callback(cachedEntry ? cachedEntry.newsList : null);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("news-list");
     const refreshButton = document.getElementById("refresh-button");
@@ -9,10 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (activeTab && activeTab.url) {
             // Fetch cached news or show loading message
-            chrome.storage.local.get(["newsCache", "lastUpdated"], (data) => {
-                const newsCache = data.newsCache || {};
-                const cachedNews = newsCache[activeTab.url];
-                const lastUpdated = data.lastUpdated || "N/A";
+            getFromCache(activeTab.url, (cachedNews) => {
 
                 if (cachedNews) {
                     // Render cached news
