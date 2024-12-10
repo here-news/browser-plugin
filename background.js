@@ -43,42 +43,46 @@ function getFromCache(url, callback) {
 // Fetch news for the given URL
 function fetchAndCacheNews(url, title, content) {
     return new Promise((resolve, reject) => {
-        const query = encodeURIComponent(`${title}`.substring(0, 120));
-        const apiUrl = `https://api.here.news/searchnews?q=${query}`;
+        chrome.storage.local.get("settings", (data) => {
+            const scoreThreshold = data.settings?.scoreThreshold || 0.91; // Default to "Similar"
+            console.log("Fetching news for:", { url, title, content, scoreThreshold }); // Debug 
+            const query = encodeURIComponent(`${title}`.substring(0, 120));
+            const apiUrl = `https://api.here.news/searchnews?q=${query}`;
 
-        chrome.action.setBadgeText({ text: "⚡" }); // Indicate loading 
+            chrome.action.setBadgeText({ text: "⚡" }); // Indicate loading 
 
-        fetch(apiUrl)
-            .then((res) => res.json())
-            .then((newsList) => {
-                console.log("Fetched news data:", newsList); // Debug
-                const relevantNews = newsList.filter((item) => item.score > 0.92);
-                const count = relevantNews.length;
+            fetch(apiUrl)
+                .then((res) => res.json())
+                .then((newsList) => {
+                    console.log("Fetched news data:", newsList); // Debug
+                    const relevantNews = newsList.filter((item) => item.score > scoreThreshold);
+                    const count = relevantNews.length;
 
-                // Update badge & title
-                chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
-                chrome.action.setTitle({ title: `${count} related news articles` });
+                    // Update badge & title
+                    chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
+                    chrome.action.setTitle({ title: `${count} related news articles` });
 
-                // Add to cache using FIFO queue
-                addToCache(url, newsList);
+                    // Add to cache using FIFO queue
+                    addToCache(url, newsList);
 
-                // Send the count to the content script
-                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                    if (tabs[0]) {
-                        chrome.tabs.sendMessage(tabs[0].id, {
-                            action: "updateBadge",
-                            value: count * 10, // Multiply count for demonstration
-                        });
-                    }
+                    // Send the count to the content script
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs[0]) {
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                action: "updateBadge",
+                                value: count * 10, // Multiply count for demonstration
+                            });
+                        }
+                    });
+
+                    resolve(relevantNews); // Resolve with the filtered news
+                })
+                .catch((err) => {
+                    console.error("Error fetching news:", err);
+                    chrome.action.setBadgeText({ text: "" }); // Clear badge on error
+                    reject(err); // Reject with the error
                 });
-
-                resolve(relevantNews); // Resolve with the filtered news
-            })
-            .catch((err) => {
-                console.error("Error fetching news:", err);
-                chrome.action.setBadgeText({ text: "" }); // Clear badge on error
-                reject(err); // Reject with the error
-            });
+        });
     });
 }
 
@@ -110,11 +114,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 function updateTabBadge(tabId, url) {
     getFromCache(url, (cachedNews) => {
         if (cachedNews) {
-            console.log("Using cached news data:", cachedNews); // Debug
-            const count = cachedNews.filter((item) => item.score > 0.92).length;
-            chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
-            chrome.action.setTitle({ title: `${count} related news articles` });
-            chrome.storage.local.set({ newsData: cachedNews });
+            // console.log("Using cached news data:", cachedNews); // Debug
+            chrome.storage.local.get("settings", (data) => {
+                const scoreThreshold = data.settings?.scoreThreshold || 0.91; // Default to "Similar"
+                const count = cachedNews.filter((item) => item.score > scoreThreshold).length;
+                chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
+                chrome.action.setTitle({ title: `${count} related news articles` });
+                chrome.storage.local.set({ newsData: cachedNews });
+            });
         } else {
             // Fetch fresh news if not cached
             chrome.tabs.sendMessage(tabId, { action: "fetchPageContext" }, (response) => {

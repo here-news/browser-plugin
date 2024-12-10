@@ -1,22 +1,49 @@
-// Wait for the DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-    const saveButton = document.getElementById('save');
-    const apiKeyInput = document.getElementById('apiKey');
-    const promptInput = document.getElementById('prompt');
+// options.js
 
-    // Load the saved API key and prompt when the options page is opened
-    chrome.storage.sync.get(['apiKey', 'prompt'], function(data) {
-        apiKeyInput.value = data.apiKey || '';
-        promptInput.value = data.prompt || '';
+document.addEventListener("DOMContentLoaded", () => {
+    const slider = document.getElementById("score-slider");
+    const scoreDisplay = document.getElementById("score-display");
+    const saveButton = document.getElementById("save-button");
+    const statusMessage = document.getElementById("status-message");
+
+    // Define slider values and corresponding thresholds
+    const thresholds = {
+        1: 0.85, // Fuzzier
+        2: 0.91, // Similar
+        3: 0.95  // Accurate
+    };
+
+    // Load stored settings
+    chrome.storage.local.get("settings", (data) => {
+        const settings = data.settings || {};
+        const currentThreshold = settings.scoreThreshold || 0.91; // Default to "Similar"
+
+        // Find the slider position corresponding to the current threshold
+        const sliderPosition = Object.keys(thresholds).find(key => thresholds[key] === currentThreshold) || 2;
+        slider.value = sliderPosition;
+        scoreDisplay.textContent = `${sliderPosition === '1' ? 'Fuzzier' : sliderPosition === '2' ? 'Similar' : 'Accurate'} (${thresholds[slider.value]})`;
     });
 
-    // Save the API key and prompt when the save button is clicked
-    saveButton.addEventListener('click', function() {
-        const apiKey = apiKeyInput.value;
-        const prompt = promptInput.value;
-        chrome.storage.sync.set({apiKey: apiKey, prompt: prompt}, function() {
-            console.log('Settings saved');
-            // You can add an alert or update the UI to indicate success
+    // Update display when slider is moved
+    slider.addEventListener("input", () => {
+        const selectedThreshold = thresholds[slider.value];
+        scoreDisplay.textContent = `${slider.value === '1' ? 'Fuzzier' : slider.value === '2' ? 'Similar' : 'Accurate'} (${selectedThreshold})`;
+    });
+
+    // Save settings when the save button is clicked
+    saveButton.addEventListener("click", () => {
+        const selectedThreshold = thresholds[slider.value];
+
+        chrome.storage.local.set({
+            settings: { scoreThreshold: selectedThreshold }
+        }, () => {
+            statusMessage.textContent = "Settings saved successfully!";
+            statusMessage.style.color = "green";
+
+            // Clear message after a short delay
+            setTimeout(() => {
+                statusMessage.textContent = "";
+            }, 2000);
         });
     });
 });

@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (cachedNews) {
                     // Render cached news
                     renderNews(cachedNews);
-                    timestamp.innerText = `Last updated: ${lastUpdated}`;
+                    //timestamp.innerText = `Last updated: ${lastUpdated}`;
                 } else {
                     container.innerHTML = "<p>Loading related news...</p>";
                 }
@@ -42,33 +42,37 @@ document.addEventListener("DOMContentLoaded", () => {
             container.innerHTML = "<p>No related news found.</p>";
         } else {
             // choose those with high scores(>0.92)
-            newsList = newsList.filter((item) => item.score > 0.92);
-            container.innerHTML = newsList
-                .map(
-                    (item) => `
-                    <div class="news-item" data-preview="${item.preview}">
-                        <p><b><a href="${item.canonical}" target="_blank">${item.title}</a></b> (${item.source}, ${new Date(item.pub_time).toLocaleString()})</p>
-                        <img src="${item.preview}" alt="Thumbnail" />
-                    </div>
-                `
-                )
-                .join("");
+            chrome.storage.local.get("settings", (data) => {
 
-            // Add event listener to each news item for preview
-            // Add hover event listeners to show/hide thumbnails
-            const newsItems = container.querySelectorAll(".news-item");
-            newsItems.forEach((newsItem) => {
-                const thumbnail = newsItem.querySelector("img");
+                const scoreThreshold = data.settings?.scoreThreshold || 0.91; // Default to "Similar"
 
-                newsItem.addEventListener("mouseenter", () => {
-                    if (thumbnail) thumbnail.style.display = "block";
-                });
+                newsList = newsList.filter((item) => item.score > scoreThreshold);
+                container.innerHTML = newsList
+                    .map(
+                        (item) => `
+                        <div class="news-item" data-preview="${item.preview}">
+                            <p><b><a href="${item.canonical}" target="_blank">${item.title}</a></b> (${item.source}, ${new Date(item.pub_time).toLocaleString()})</p>
+                            <img src="${item.preview}" alt="Thumbnail" />
+                        </div>
+                    `
+                    )
+                    .join("");
+                    // Add event listener to each news item for preview
+                    // Add hover event listeners to show/hide thumbnails
+                    const newsItems = container.querySelectorAll(".news-item");
+                    newsItems.forEach((newsItem) => {
+                    const thumbnail = newsItem.querySelector("img");
 
-                newsItem.addEventListener("mouseleave", () => {
-                    if (thumbnail) thumbnail.style.display = "none";
+                    newsItem.addEventListener("mouseenter", () => {
+                        if (thumbnail) thumbnail.style.display = "block";
+                    });
+
+                    newsItem.addEventListener("mouseleave", () => {
+                        if (thumbnail) thumbnail.style.display = "none";
+                    });
                 });
             });
-
+                
         }
     }
 });
