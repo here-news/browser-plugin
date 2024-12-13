@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById("score-slider");
     const scoreDisplay = document.getElementById("score-display");
+    const cacheSizeSelect = document.getElementById("cache-size-select");
     const saveButton = document.getElementById("save-button");
     const statusMessage = document.getElementById("status-message");
 
@@ -16,12 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load stored settings
     chrome.storage.local.get("settings", (data) => {
         const settings = data.settings || {};
-        const currentThreshold = settings.scoreThreshold || 0.91; // Default to "Similar"
 
-        // Find the slider position corresponding to the current threshold
+        // Set score threshold
+        const currentThreshold = settings.scoreThreshold || 0.91; // Default to "Similar"
         const sliderPosition = Object.keys(thresholds).find(key => thresholds[key] === currentThreshold) || 2;
         slider.value = sliderPosition;
-        scoreDisplay.textContent = `${sliderPosition === '1' ? 'Fuzzier' : sliderPosition === '2' ? 'Similar' : 'Accurate'} (${thresholds[slider.value]})`;
+        scoreDisplay.textContent = `${slider.value === '1' ? 'Fuzzier' : slider.value === '2' ? 'Similar' : 'Accurate'} (${thresholds[slider.value]})`;
+
+        // Set cache size
+        const currentCacheSize = settings.cacheSize || 100; // Default to 100
+        cacheSizeSelect.value = currentCacheSize;
     });
 
     // Update display when slider is moved
@@ -33,9 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Save settings when the save button is clicked
     saveButton.addEventListener("click", () => {
         const selectedThreshold = thresholds[slider.value];
+        const selectedCacheSize = parseInt(cacheSizeSelect.value, 10);
 
         chrome.storage.local.set({
-            settings: { scoreThreshold: selectedThreshold }
+            settings: { 
+                scoreThreshold: selectedThreshold,
+                cacheSize: selectedCacheSize
+            }
         }, () => {
             statusMessage.textContent = "Settings saved successfully!";
             statusMessage.style.color = "green";

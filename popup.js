@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     .map(
                         (item) => `
                         <div class="news-item" data-preview="${item.preview}">
-                            <p><b><a href="${item.canonical}" target="_blank">${item.title}</a></b> (${item.source}, ${new Date(item.pub_time).toLocaleString()})</p>
                             <img src="${item.preview}" alt="Thumbnail" />
+                            <p><b><a href="${item.canonical}" target="_blank">${item.title}</a></b> (${item.source}, ${new Date(item.pub_time).toLocaleString()})</p>
                         </div>
                     `
                     )
@@ -65,10 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     newsItem.addEventListener("mouseenter", () => {
                         if (thumbnail) thumbnail.style.display = "block";
+                        //hightlight the news item
+                        newsItem.style.backgroundColor = "rgba(0, 0, 0, 0.2)";
                     });
 
                     newsItem.addEventListener("mouseleave", () => {
                         if (thumbnail) thumbnail.style.display = "none";
+                        //remove the highlight
+                        newsItem.style.backgroundColor = "rgba(0, 0, 0, 0)";
                     });
                 });
             });

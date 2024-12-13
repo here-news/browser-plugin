@@ -16,7 +16,7 @@
         label {
             font-size: 16px;
         }
-        #slider-container {
+        #slider-container, #cache-size-container {
             margin-top: 20px;
         }
         #score-slider {
@@ -27,6 +27,12 @@
             font-size: 14px;
             margin-bottom: 20px;
             font-weight: bold;
+        }
+        #cache-size-select {
+            margin-top: 10px;
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
         }
         #save-button {
             background-color: #007BFF;
@@ -48,13 +54,30 @@
 </head>
 <body>
     <h1>Extension Options</h1>
+
+    <!-- Search Accuracy Section -->
     <label for="score-slider">Select Search Accuracy:</label>
     <div id="slider-container">
         <input type="range" id="score-slider" min="1" max="3" step="1">
     </div>
     <p id="score-display">Loading...</p>
+
+    <!-- Cache Size Section -->
+    <label for="cache-size-select">Select Cache Size:</label>
+    <div id="cache-size-container">
+        <select id="cache-size-select">
+            <option value="20">Optimal (20 items)</option>
+            <option value="50">Balanced (50 items)</option>
+            <option value="100">Performance (100 items)</option>
+        </select>
+    </div>
+
+    <!-- Save Button -->
     <button id="save-button">Save Settings</button>
+
+    <!-- Status Message -->
     <p id="status-message"></p>
+
     <script src="options.js"></script>
 </body>
 </html>
